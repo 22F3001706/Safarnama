@@ -129,3 +129,36 @@ function backToIndex(sectionId) {
     index.style.animation = 'fadeIn 0.4s ease';
   }
 }
+
+// ═══════════════════════════════
+//   PHILOSOPHY NAVIGATION
+// ═══════════════════════════════
+
+function showPhilosophy(id) {
+  const index = document.getElementById('index-philosophy');
+  if (index) index.style.display = 'none';
+
+  const single = document.getElementById('single-philosophy');
+  if (single) single.style.display = 'block';
+
+  document.querySelectorAll('.philosophy-content').forEach(p => {
+    p.style.display = 'none';
+  });
+
+  const target = document.getElementById(id);
+  if (target) {
+    target.style.display = 'block';
+    target.style.animation = 'fadeIn 0.4s ease';
+  }
+}
+
+function backToPhilosophy() {
+  const single = document.getElementById('single-philosophy');
+  if (single) single.style.display = 'none';
+
+  const index = document.getElementById('index-philosophy');
+  if (index) {
+    index.style.display = 'block';
+    index.style.animation = 'fadeIn 0.4s ease';
+  }
+}
