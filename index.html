@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Safarnama</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=Gulzar&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+
+    <div class="sidebar-header" onclick="showSection('home'); closeAllDropdowns();" style="cursor:pointer;">
+        <h1 class="site-title">Safarnama</h1>
+        <p class="site-subtitle">a quiet collection</p>
+    </div>
+
+    <nav class="sidebar-nav">
+
+      <!-- Poems -->
+      <div class="nav-item">
+        <button class="nav-btn" onclick="toggleDropdown('poems-drop')">
+          <span>Poems</span>
+          <span class="arrow" id="poems-arrow">›</span>
+        </button>
+        <div class="dropdown" id="poems-drop">
+          <button class="sub-btn" onclick="showSection('poems-hindi')">Hindi</button>
+          <button class="sub-btn" onclick="showSection('poems-urdu')">Urdu</button>
+          <button class="sub-btn" onclick="showSection('poems-english')">English</button>
+        </div>
+      </div>
+
+      <!-- Quotes -->
+      <div class="nav-item">
+        <button class="nav-btn" onclick="toggleDropdown('quotes-drop')">
+          <span>Quotes</span>
+          <span class="arrow" id="quotes-arrow">›</span>
+        </button>
+        <div class="dropdown" id="quotes-drop">
+          <button class="sub-btn" onclick="showSection('quotes-hindi')">Hindi</button>
+          <button class="sub-btn" onclick="showSection('quotes-urdu')">Urdu</button>
+          <button class="sub-btn" onclick="showSection('quotes-english')">English</button>
+        </div>
+      </div>
+
+      <!-- Philosophy -->
+      <div class="nav-item">
+        <button class="nav-btn" onclick="showSection('philosophy')">
+          <span>Philosophy</span>
+        </button>
+      </div>
+
+      <!-- Ideas -->
+      <div class="nav-item">
+        <button class="nav-btn" onclick="showSection('ideas')">
+          <span>Ideas</span>
+        </button>
+      </div>
+
+      <!-- Visuals -->
+      <div class="nav-item">
+        <button class="nav-btn" onclick="showSection('visuals')">
+          <span>Visuals</span>
+        </button>
+      </div>
+
+      <!-- About -->
+      <div class="nav-item">
+        <button class="nav-btn" onclick="showSection('about')">
+          <span>About</span>
+        </button>
+      </div>
+
+    </nav>
+
+  </aside>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <main class="main-content">
+
+    <!-- HOME / LANDING -->
+    <section class="section active" id="home">
+        <div class="landing">
+
+            <h2 class="landing-title">safar·na·ma</h2>
+            <p class="landing-meaning">سفرنامہ &nbsp;·&nbsp; सफ़रनामा</p>
+
+            <div class="landing-line"></div>
+
+            <blockquote class="landing-quote">
+            <strong>We don't read and write poetry because it's cute. We read and write
+            poetry because we are members of the human race. And the human race
+            is filled with passion. And medicine, law, business, engineering —
+            these are noble pursuits and necessary to sustain life. But poetry,
+            beauty, romance, love — these are what we stay alive for.</strong>
+            <br><br>
+            To quote from Whitman — <em>"O me! O life!... of the questions of
+            these recurring; of the endless trains of the faithless... of cities
+            filled with the foolish; what good amid these, O me, O life?"</em>
+            <br><br>
+            Answer. That you are here — that life exists, and identity; that the
+            powerful play goes on and you may contribute a verse.
+            <br><br>
+            <strong>What will your verse be?</strong>
+            <span class="landing-quote-author">— N.H. Kleinbaum, Dead Poets Society</span>
+            </blockquote>
+
+            <div class="landing-line"></div>
+
+            <p class="landing-hint">Choose a section from the left to begin.</p>
+
+        </div>
+    </section>
+
+    <!-- POEMS — ENGLISH -->
+    <section class="section" id="poems-english">
+    <div class="section-header">
+        <h2 class="section-title">English Poems</h2>
+    </div>
+
+    <!-- POEM INDEX — list of all poems -->
+    <div class="poem-index" id="index-poems-english">
+        <div class="poem-index-list">
+
+        <div class="poem-index-item" onclick="showPoem('poems-english', 'frost-stopping')">
+            <div class="poem-index-left">
+            <span class="poem-index-title">Stopping by Woods on a Snowy Evening</span>
+            <span class="poem-index-author">Robert Frost</span>
+            </div>
+            <div class="poem-index-right">
+            <span class="poem-index-year">1922</span>
+            <span class="poem-index-arrow">›</span>
+            </div>
+        </div>
+
+        <!-- add more poems here in future -->
+
+        </div>
+    </div>
+
+    <!-- SINGLE POEM VIEW -->
+    <div class="poem-single" id="single-poems-english" style="display:none;">
+
+        <!-- Back button -->
+        <button class="back-btn" onclick="backToIndex('poems-english')">
+        ‹ &nbsp; Back to English Poems
+        </button>
+
+        <!-- Poems live here, only one visible at a time -->
+        <div class="poem-card" id="frost-stopping" style="display:none;">
+        <div class="poem-card-top">
+            <div class="poem-meta">
+            <h3 class="poem-title">Stopping by Woods on a Snowy Evening</h3>
+            <p class="poem-author">Robert Frost</p>
+            </div>
+        </div>
+
+        <p class="poem-note">
+            A traveler pauses mid-journey to watch snow fall silently into a dark wood.
+            The scene holds him — its stillness almost seductive. But he cannot stay.
+            He has promises to keep, miles to go, a life that demands he move on.
+            It is not a poem about rest. It is a meditation on the tension between
+            longing and duty — and its closing lines are not a complaint but a weary,
+            resolute affirmation of the need to carry on.
+        </p>
+
+        <div class="poem-divider"></div>
+
+        <div class="poem-body">
+            <p class="poem-lines">
+            The woods are lovely, dark and deep,<br>
+            But I have promises to keep,<br>
+            And miles to go before I sleep,<br>
+            And miles to go before I sleep.
+            </p>
+        </div>
+        </div>
+
+        <!-- paste future english poems here as new .poem-card divs -->
+
+    </div>
+    </section>
+
+    <!-- POEMS — HINDI -->
+    <section class="section" id="poems-hindi">
+    <div class="section-header">
+        <h2 class="section-title">Hindi Poems</h2>
+        <p class="section-sub">कविताएँ</p>
+    </div>
+
+    <div class="poem-index" id="index-poems-hindi">
+        <div class="poem-index-list">
+        <!-- add hindi poems here -->
+        <p class="placeholder-text">Your Hindi poems will live here.</p>
+        </div>
+    </div>
+
+    <div class="poem-single" id="single-poems-hindi" style="display:none;">
+        <button class="back-btn" onclick="backToIndex('poems-hindi')">
+        ‹ &nbsp; Back to Hindi Poems
+        </button>
+        <!-- hindi poem cards go here -->
+    </div>
+    </section>
+
+    <!-- POEMS — URDU -->
+    <section class="section urdu" id="poems-urdu">
+    <div class="section-header">
+        <h2 class="section-title">Urdu Poems</h2>
+        <p class="section-sub">اردو شاعری</p>
+    </div>
+
+    <div class="poem-index" id="index-poems-urdu">
+        <div class="poem-index-list">
+        <!-- add urdu poems here -->
+        <p class="placeholder-text">Your Urdu poems will live here.</p>
+        </div>
+    </div>
+
+    <div class="poem-single" id="single-poems-urdu" style="display:none;">
+        <button class="back-btn" onclick="backToIndex('poems-urdu')">
+        ‹ &nbsp; Back to Urdu Poems
+        </button>
+        <!-- urdu poem cards go here -->
+    </div>
+    </section>
+
+    <!-- QUOTES — HINDI -->
+    <section class="section" id="quotes-hindi">
+      <div class="section-header">
+        <h2 class="section-title">Hindi Quotes</h2>
+        <p class="section-sub">विचार</p>
+      </div>
+      <p class="placeholder-text">Your Hindi quotes will live here.</p>
+    </section>
+
+    <!-- QUOTES — URDU -->
+    <section class="section urdu" id="quotes-urdu">
+      <div class="section-header">
+        <h2 class="section-title">Urdu Quotes</h2>
+        <p class="section-sub">اقوال</p>
+      </div>
+      <p class="placeholder-text">Your Urdu quotes will live here.</p>
+    </section>
+
+    <!-- QUOTES — ENGLISH -->
+    <section class="section" id="quotes-english">
+      <div class="section-header">
+        <h2 class="section-title">English Quotes</h2>
+      </div>
+      <p class="placeholder-text">Your English quotes will live here.</p>
+    </section>
+
+    <!-- PHILOSOPHY -->
+    <section class="section" id="philosophy">
+      <div class="section-header">
+        <h2 class="section-title">Philosophy</h2>
+        <p class="section-sub">thoughts on existence</p>
+      </div>
+      <p class="placeholder-text">Your philosophy notes will live here.</p>
+    </section>
+
+    <!-- IDEAS -->
+    <section class="section" id="ideas">
+      <div class="section-header">
+        <h2 class="section-title">Ideas</h2>
+        <p class="section-sub">sparks worth keeping</p>
+      </div>
+      <p class="placeholder-text">Your ideas will live here.</p>
+    </section>
+
+    <!-- VISUALS -->
+    <section class="section" id="visuals">
+      <div class="section-header">
+        <h2 class="section-title">Visuals</h2>
+        <p class="section-sub">images that stayed</p>
+      </div>
+      <p class="placeholder-text">Your visual gallery will live here.</p>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section" id="about">
+      <div class="section-header">
+        <h2 class="section-title">About</h2>
+        <p class="section-sub">who is this, really</p>
+      </div>
+      
+      <div class="about-body">
+        <div class="about-block">
+            <h3 class="about-label">Introduction</h3>
+            <p class="about-text">
+                Everything here is borrowed — stolen from authors I've stayed up reading,
+                films that quietly wrecked me, and songs that arrived at exactly the
+                right moment. Safarnama is not my writing. It is my listening. A record
+                of everything that passed through me and left a mark.
+            </p>
+            <blockquote class="about-quote">
+                What's in a name? That which we call a rose by any other name would smell as sweet.
+                <span class="about-quote-author">— William Shakespeare</span>
+            </blockquote>
+            <p class="about-text">
+                So if you ask who I am — I am simply what moved me.
+            </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
