@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeing Linear Algebra Like a Layman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1209;
+    --ink-light: #4a3f2f;
+    --ink-muted: #8a7a66;
+    --paper: #f7f3ec;
+    --paper-dark: #ede7da;
+    --paper-darker: #e0d8c8;
+    --accent: #c0392b;
+    --accent-warm: #e67e22;
+    --accent-cool: #2980b9;
+    --accent-green: #27ae60;
+    --rule: #c8bfaf;
+    --mono: 'JetBrains Mono', monospace;
+    --display: 'Playfair Display', serif;
+    --body: 'Source Serif 4', serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 18px;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  /* ── MASTHEAD ── */
+  .masthead {
+    border-bottom: 3px double var(--rule);
+    padding: 2rem 0 1.5rem;
+    text-align: center;
+    background: var(--paper);
+    position: relative;
+  }
+  .masthead::before {
+    content: '✦ MATHEMATICAL DISPATCHES ✦';
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--ink-muted);
+    margin-bottom: 1.5rem;
+  }
+  .masthead-rule {
+    width: 60px;
+    height: 2px;
+    background: var(--accent);
+    margin: 1rem auto;
+  }
+  .masthead-sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-deck {
+    font-size: 1.2rem;
+    color: var(--ink-light);
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    font-style: italic;
+    line-height: 1.6;
+  }
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: 0.1em;
+  }
+  .hero-meta span::before { content: '— '; }
+  .hero-ornament {
+    font-size: 2rem;
+    color: var(--rule);
+    margin: 3rem 0 0;
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+  .article-body {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .chapter {
+    padding: 5rem 2rem 0;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .chapter-number {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    color: var(--accent);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+  .chapter h2 {
+    font-family: var(--display);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 1.25rem;
+  }
+  .chapter-intro {
+    font-size: 1.1rem;
+    color: var(--ink-light);
+    font-style: italic;
+    border-left: 3px solid var(--accent);
+    padding-left: 1.25rem;
+    margin-bottom: 2.5rem;
+    line-height: 1.65;
+  }
+
+  /* ── BODY TEXT ── */
+  .prose {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 2rem 2rem;
+  }
+  .prose p {
+    margin-bottom: 1.5rem;
+    color: var(--ink-light);
+  }
+  .prose p:first-child::first-letter {
+    font-family: var(--display);
+    font-size: 4.5rem;
+    font-weight: 900;
+    float: left;
+    line-height: 0.75;
+    margin-right: 0.1em;
+    margin-top: 0.1em;
+    color: var(--accent);
+  }
+  .prose strong { color: var(--ink); font-weight: 600; }
+
+  /* ── PULL QUOTES ── */
+  .pullquote {
+    margin: 3rem 0;
+    padding: 2rem 2.5rem;
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    text-align: center;
+  }
+  .pullquote p {
+    font-family: var(--display);
+    font-size: 1.6rem;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--ink);
+    margin: 0;
+  }
+  .pullquote p::before { content: '\201C'; color: var(--accent); }
+  .pullquote p::after { content: '\201D'; color: var(--accent); }
+
+  /* ── CONCEPT CARDS ── */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5px;
+    margin: 3rem 0;
+    background: var(--rule);
+    border: 1.5px solid var(--rule);
+  }
+  .concept-card {
+    background: var(--paper);
+    padding: 1.75rem;
+    transition: background 0.2s;
+  }
+  .concept-card:hover { background: var(--paper-dark); }
+  .concept-card .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+  .concept-card h3 {
+    font-family: var(--display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+  }
+  .concept-card p {
+    font-size: 0.9rem;
+    color: var(--ink-light);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── MATH CALLOUT ── */
+  .math-block {
+    background: var(--paper-darker);
+    border-left: 4px solid var(--accent);
+    padding: 1.5rem 2rem;
+    margin: 2.5rem 0;
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    color: var(--ink);
+    line-height: 2;
+    overflow-x: auto;
+  }
+  .math-block .comment {
+    color: var(--ink-muted);
+    font-style: italic;
+    font-family: var(--body);
+    font-size: 0.85rem;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    margin: 3rem 0;
+    position: relative;
+    padding-left: 2rem;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent-cool), var(--accent-green));
+  }
+  .timeline-item {
+    margin-bottom: 2.5rem;
+    position: relative;
+    padding-left: 1.5rem;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2.5rem;
+    top: 0.5rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--accent);
+  }
+  .timeline-item:nth-child(2)::before { border-color: var(--accent-warm); }
+  .timeline-item:nth-child(3)::before { border-color: var(--accent-cool); }
+  .timeline-item:nth-child(4)::before { border-color: var(--accent-green); }
+  .timeline-item:nth-child(5)::before { border-color: var(--ink-muted); }
+  .timeline-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .timeline-item h4 {
+    font-family: var(--display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+  .timeline-item p {
+    font-size: 0.9rem;
+    color: var(--ink-light);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2.5rem 0;
+    font-size: 0.9rem;
+  }
+  .compare-table th {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--ink);
+    padding: 0.75rem 1rem;
+    text-align: left;
+  }
+  .compare-table td {
+    padding: 0.85rem 1rem;
+    color: var(--ink-light);
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:nth-child(even) td { background: var(--paper-dark); }
+  .compare-table td:first-child {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--ink);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* ── HIGHLIGHT BAND ── */
+  .band {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4rem 2rem;
+    margin: 5rem 0;
+    text-align: center;
+  }
+  .band h2 {
+    font-family: var(--display);
+    font-size: clamp(1.6rem, 4vw, 2.5rem);
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+    color: var(--paper);
+  }
+  .band p {
+    font-size: 1rem;
+    color: var(--paper-darker);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* ── ML APPLICATIONS ── */
+  .app-list {
+    list-style: none;
+    margin: 2rem 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .app-list li {
+    background: var(--paper-dark);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--accent-cool);
+    padding: 1.25rem;
+    font-size: 0.9rem;
+  }
+  .app-list li:nth-child(2n) { border-top-color: var(--accent-green); }
+  .app-list li:nth-child(3n) { border-top-color: var(--accent); }
+  .app-list li:nth-child(4n) { border-top-color: var(--accent-warm); }
+  .app-list li strong {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+  }
+  .app-list li span { color: var(--ink-light); line-height: 1.5; display: block; }
+
+  /* ── DIVIDERS ── */
+  .ornamental-rule {
+    text-align: center;
+    margin: 4rem 0;
+    color: var(--rule);
+    font-size: 1.2rem;
+    letter-spacing: 1rem;
+  }
+
+  .section-rule {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 4rem auto;
+    max-width: 720px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 3px double var(--rule);
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-top: 5rem;
+  }
+  footer p {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: 0.1em;
+    line-height: 2;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero h1, .hero-deck, .hero-meta { animation: fadeUp 0.8s ease both; }
+  .hero h1 { animation-delay: 0.1s; }
+  .hero-deck { animation-delay: 0.25s; }
+  .hero-meta { animation-delay: 0.4s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .concept-grid { grid-template-columns: 1fr; }
+    .app-list { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 2.5rem; }
+    .chapter h2 { font-size: 1.6rem; }
+    .prose p:first-child::first-letter { font-size: 3.5rem; }
+  }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--paper-dark);
+    border: 1px solid var(--rule);
+    padding: 2rem 2.5rem;
+    margin: 3rem auto;
+    max-width: 520px;
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    display: block;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+  }
+  .toc ol li {
+    counter-increment: toc;
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px dotted var(--rule);
+    font-size: 0.9rem;
+    color: var(--ink-light);
+  }
+  .toc ol li:last-child { border-bottom: none; }
+  .toc ol li::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .toc a { color: var(--ink-light); text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="masthead-rule"></div>
+  <p class="masthead-sub">A Conversation About Mathematics &amp; Its Unreasonable Usefulness</p>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <span class="hero-eyebrow">Long Read · Linear Algebra</span>
+  <h1>Seeing Linear Algebra<br><em>Like a Layman</em></h1>
+  <p class="hero-deck">How a simple question — "can I find values that satisfy these equations?" — grew into the mathematical engine powering everything from Google search to the AI writing this sentence.</p>
+  <div class="hero-meta">
+    <span>From First Principles</span>
+    <span>Vectors to Neural Networks</span>
+    <span>No Prerequisites</span>
+  </div>
+  <div class="hero-ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
+</header>
+
+<!-- TOC -->
+<div class="container">
+  <nav class="toc">
+    <span class="toc-title">Contents</span>
+    <ol>
+      <li><a href="#problem">The Problem That Started Everything</a></li>
+      <li><a href="#vectors">Vectors &amp; Matrices — The Machine</a></li>
+      <li><a href="#three-cases">The Crisis: Three Possible Worlds</a></li>
+      <li><a href="#vector-space">Vector Spaces — Building the Universe</a></li>
+      <li><a href="#independence">Independence, Span &amp; Basis</a></li>
+      <li><a href="#rank">Rank — Counting What Matters</a></li>
+      <li><a href="#transformation">The Revelation: Matrices Are Transformations</a></li>
+      <li><a href="#decomposition">Equivalence, Similarity &amp; SVD</a></li>
+      <li><a href="#orthogonal">Orthogonality — The Cleanest Tool</a></li>
+      <li><a href="#affine">Affine Space — Freeing the Origin</a></li>
+      <li><a href="#ml">Where It All Lives: ML &amp; Deep Learning</a></li>
+    </ol>
+  </nav>
+</div>
+
+<!-- ════════════════════════════════════ -->
+<!-- CHAPTER 1 -->
+<!-- ════════════════════════════════════ -->
+<section id="problem">
+  <div class="chapter">
+    <span class="chapter-number">Chapter 01</span>
+    <h2>The Problem That Started Everything</h2>
+    <p class="chapter-intro">Mathematics has always been a tool before it was an art. Linear algebra was born from a simple, urgent, practical need: how do you solve many equations at once?</p>
+  </div>
+  <div class="prose">
+    <p>Begin with ordinary algebra. You have one equation, one unknown: <strong>2x = 6</strong>. Divide both sides. Done. One answer, always.</p>
+    <p>Now scale it up. You have a hundred products, a hundred prices, a hundred supply constraints — all tangled together. Writing them out one by one is hopeless. You need a machine. You need a language that can hold all of this simultaneously and manipulate it cleanly.</p>
+    <p>That machine is linear algebra. It was not invented in a philosopher's study — it was forced into existence by engineers, astronomers, and economists who needed to handle many variables changing together at the same time.</p>
+
+    <div class="pullquote">
+      <p>Every great mathematical tool was once just a desperate solution to a problem nobody else could solve.</p>
+    </div>
+
+    <p>The central question that drives the entire subject is this: <strong>can I find values that satisfy a set of equations? And if yes, how many solutions exist?</strong> Everything you will read in this essay — vectors, matrices, eigenvalues, neural networks — is an answer to some part of that question.</p>
+  </div>
+</section>
+
+<div class="ornamental-rule">— ✦ —</div>
+
+<!-- ════════════════════════════════════ -->
+<!-- CHAPTER 2 -->
+<!-- ════════════════════════════════════ -->
+<section id="vectors">
+  <div class="chapter">
+    <span class="chapter-number">Chapter 02</span>
+    <h2>Vectors &amp; Matrices — The Machine</h2>
+    <p class="chapter-intro">Before you can solve a system of equations, you need a language that can express one. That language has two words: vector and matrix.</p>
+  </div>
+  <div class="prose">
+    <p>A <strong>vector</strong> is simply a list of numbers — a direction and a magnitude in some space. Think of it as an arrow. The unknowns you're solving for form a vector. The targets you're trying to reach form another vector.</p>
+    <p>A <strong>matrix</strong> is a rectangular grid of numbers. But its true identity is not a grid — it is a compact way to represent an entire system of equations. Instead of writing out ten equations with ten unknowns, you write one matrix equation: <strong>Ax = b</strong>. The matrix A holds all the coefficients. The vector x holds all the unknowns. The vector b holds all the targets.</p>
+  </div>
+
+  <div class="container">
+    <div class="math-block">
+      <span class="comment">// A system of two equations:</span><br>
+      2x₁ + 1x₂ = 5<br>
+      3x₁ + 4x₂ = 6<br><br>
+      <span class="comment">// Written as a matrix equation Ax = b:</span><br>
+      [2  1] [x₁]   [5]<br>
+      [3  4] [x₂] = [6]
+    </div>
+  </div>
+
+  <div class="prose">
+    <p>The matrix is not just a notational shortcut. It is a <strong>transformation machine</strong> — a function that takes a vector in and produces a vector out. This realisation, when it fully lands, changes how you see every equation you will ever write.</p>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<!-- ════════════════════════════════════ -->
+<!-- CHAPTER 3 -->
+<!-- ════════════════════════════════════ -->
+<section id="three-cases">
+  <div class="chapter">
+    <span class="chapter-number">Chapter 03</span>
+    <h2>The Crisis: Three Possible Worlds</h2>
+    <p class="chapter-intro">You set up your matrix equation. You try to solve it. And you discover something uncomfortable: there are three completely different things that can happen.</p>
+  </div>
+  <div class="prose">
+    <p>When you try to solve <strong>Ax = b</strong>, the universe splits into three possible outcomes. Not two — three. And figuring out which world you're in, and <em>why</em>, requires every concept that comes after.</p>
+  </div>
+
+  <div class="container">
+    <div class="concept-grid">
+      <div class="concept-card">
+        <span class="label">World I</span>
+        <h3>Exactly One Solution</h3>
+        <p>The equations all point at a single, unique answer. The system is determined. This is the clean, happy case we hope for.</p>
+      </div>
+      <div class="concept-card">
+        <span class="label">World II</span>
+        <h3>No Solution</h3>
+        <p>The equations contradict each other. They describe a target that is impossible to reach. No matter what x you try, Ax ≠ b.</p>
+      </div>
+      <div class="concept-card" style="grid-column: 1 / -1;">
+        <span class="label">World III — The Interesting One</span>
+        <h3>Infinitely Many Solutions</h3>
+        <p>Some equations are secretly copies of others, just rescaled or combined. They don't add new information. The system is underdetermined — there are free variables, whole dimensions of freedom. This case is where most of linear algebra's depth lives.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="prose">
+    <p>Why do these three cases exist? What determines which world you land in? That is the question that forces all the remaining concepts into existence. We needed a framework to think about the <em>structure</em> of equations — not just their solutions. That framework is the vector space.</p>
+  </div>
+</section>
+
+<div class="ornamental-rule">— ✦ —</div>
+
+<!-- ════════════════════════════════════ -->
+<!-- CHAPTER 4 -->
+<!-- ════════════════════════════════════ -->
+<section id="vector-space">
+  <div class="chapter">
+    <span class="chapter-number">Chapter 04</span>
+    <h2>Vector Spaces — Building the Universe</h2>
+    <p class="chapter-intro">To understand why equations behave the way they do, we need to understand the space those equations live in.</p>
+  </div>
+  <div class="prose">
+    <p>A <strong>vector space</strong> is a set of vectors with two clean operations: addition and scalar multiplication. You can add any two vectors and stay inside the set. You can scale any vector by any number and stay inside the set. There is always a zero vector.</p>
+    <p>Think of it as the <em>universe</em> where your problem lives. ℝ² is the flat plane. ℝ³ is ordinary 3D space. ℝⁿ is the generalisation to any number of dimensions — strange to visualise, but mathematically identical in behaviour.</p>
+    <p>The vector space doesn't tell you the answer to your equations. But it tells you the <strong>rules of the game</strong> — what operations are valid, what the possible answers look like, what constraints the solutions must satisfy.</p>
+
+    <div class="pullquote">
+      <p>A vector space is not a place you go to. It is the structure that makes mathematical reasoning possible in the first place.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<!-- ════════════════════════════════════ -->
+<!-- CHAPTER 5 -->
+<!-- ════════════════════════════════════ -->
+<section id="independence">
+  <div class="chapter">
+    <span class="chapter-number">Chapter 05</span>
+    <h2>Independence, Span &amp; Basis</h2>
+    <p class="chapter-intro">Three concepts that answer the same question from three different angles: how many genuinely different directions does a set of vectors contain?</p>
+  </div>
+
+  <div class="container">
+    <div class="timeline">
+      <div class="timeline-item">
+        <span class="timeline-label">Concept I</span>
+        <h4>Linear Independence</h4>
+        <p>A set of vectors is linearly independent if no vector in the set can be made from the others. Each one adds a genuinely new direction. Dependent vectors are redundant — they're already secretly present in the others. Redundant equations produce underdetermined systems: infinitely many solutions.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-label">Concept II</span>
+        <h4>Span</h4>
+        <p>The span of a set of vectors is everything you can reach by scaling and adding them in every possible combination. It is the smallest subspace containing those vectors. Ask: "given these directions, what is every location I can build?" The answer is the span.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-label">Concept III</span>
+        <h4>Basis</h4>
+        <p>A basis is the minimal set of independent vectors whose span covers the entire space. No waste, no gaps. It is the most efficient description possible. The number of vectors in any basis for a space is always the same — and that number is the dimension of the space.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-label">The Insight</span>
+        <h4>Span is always a subspace</h4>
+        <p>The span of any set of vectors satisfies all three subspace requirements automatically. It contains the zero vector (set all scalars to zero). It's closed under addition. It's closed under scaling. This is not a coincidence — it falls directly from the definitions. The span is the smallest subspace that contains those vectors.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ornamental-rule">— ✦ —</div>
+
+<!-- ════════════════════════════════════ -->
+<!-- CHAPTER 6 -->
+<!-- ════════════════════════════════════ -->
+<section id="rank">
+  <div class="chapter">
+    <span class="chapter-number">Chapter 06</span>
+    <h2>Rank — Counting What Matters</h2>
+    <p class="chapter-intro">Rank is the single number that captures the essence of a matrix — how much real information it contains, stripped of all redundancy.</p>
+  </div>
+  <div class="prose">
+    <p>The <strong>rank</strong> of a matrix is the number of genuinely independent columns it has. It is simultaneously three things: the number of pivot columns after row reduction, the dimension of the column space (the image), and the number of linearly independent rows.</p>
+    <p>Rank answers the fundamental question of the three-case crisis directly. If rank equals the number of unknowns and the system is consistent — exactly one solution. If the system is inconsistent regardless — no solution. If rank is less than the number of unknowns — infinitely many solutions, with exactly (n − rank) free variables.</p>
+
+    <div class="math-block">
+      <span class="comment">// The Rank-Nullity Theorem — a conservation law for dimensions:</span><br><br>
+      dim(Kernel) + dim(Image) = n<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;nullity   +   rank   = dimension of domain<br><br>
+      <span class="comment">// Whatever A destroys (kernel) plus whatever it produces (image)</span><br>
+      <span class="comment">// must add up to the total dimensions you started with.</span>
+    </div>
+
+    <p>The <strong>kernel</strong> is everything the transformation destroys — all vectors that map to zero. The word comes from the German "Kern" meaning core or seed. The <strong>image</strong> is everything the transformation can produce — all possible outputs. Every concept you've seen so far is connected through this single conservation law.</p>
+  </div>
+</section>
+
+<!-- BAND -->
+<div class="band">
+  <h2>The slope m you learned in school<br>was always a 1×1 matrix.<br>You just didn't know it yet.</h2>
+  <p>In y = mx, the coefficient m stretches the number line. In Ax = b, the matrix A stretches, rotates, and projects space itself. Same mathematical structure, higher dimension. Linear algebra is just algebra that grew up.</p>
+</div>
+
+<!-- ════════════════════════════════════ -->
+<!-- CHAPTER 7 -->
+<!-- ════════════════════════════════════ -->
+<section id="transformation">
+  <div class="chapter">
+    <span class="chapter-number">Chapter 07</span>
+    <h2>The Revelation: Matrices Are Transformations</h2>
+    <p class="chapter-intro">At some point in learning linear algebra, the perspective shifts completely. The matrix stops being a grid of numbers and starts being a function that reshapes space itself.</p>
+  </div>
+  <div class="prose">
+    <p>A <strong>linear transformation</strong> T: ℝⁿ → ℝᵐ is a function from one vector space to another. It takes a vector as input and produces a vector as output. Every matrix defines exactly one linear transformation — and every linear transformation can be represented by exactly one matrix (given a choice of bases).</p>
+    <p>The matrix A is not just a system of coefficients. It is a <em>machine that transforms space</em>. Depending on its entries, it can rotate a plane, stretch space along an axis, project three dimensions onto two, or reflect across a line. Each of these is a linear transformation.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <span class="label">Property I</span>
+        <h3>Monomorphism (Injective)</h3>
+        <p>No two inputs map to the same output. Information is never lost. The kernel contains only the zero vector. Different inputs remain distinguishable after transformation.</p>
+      </div>
+      <div class="concept-card">
+        <span class="label">Property II</span>
+        <h3>Epimorphism (Surjective)</h3>
+        <p>Every possible output is reachable. The transformation covers the entire codomain. The image equals the whole target space. No gaps, no unreachable regions.</p>
+      </div>
+      <div class="concept-card" style="grid-column: 1 / -1;">
+        <span class="label">Property III — The Ideal</span>
+        <h3>Isomorphism (Bijective)</h3>
+        <p>Both injective and surjective simultaneously. Every input maps to a unique output and every output is reachable. The transformation is perfectly reversible. The two spaces are structurally identical — just seen from different coordinate systems.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<!-- ════════════════════════════════════ -->
+<!-- CHAPTER 8 -->
+<!-- ════════════════════════════════════ -->
+<section id="decomposition">
+  <div class="chapter">
+    <span class="chapter-number">Chapter 08</span>
+    <h2>Equivalence, Similarity &amp; SVD</h2>
+    <p class="chapter-intro">The same transformation can be written in infinitely many ways. The art is finding the simplest one — the representation where the transformation's true nature is finally visible.</p>
+  </div>
+  <div class="prose">
+    <p>If A is a matrix and we find invertible matrices P and Q such that <strong>B = PAQ</strong>, then A and B are called <em>equivalent</em>. They represent the same transformation, viewed from different coordinate systems on both input and output sides. The simplest equivalent form — called the normal form — has a block of identity in the top-left corner and zeros everywhere else. Its rank is written on its face.</p>
+    <p>If instead we restrict to a <em>single</em> invertible matrix P such that <strong>D = P⁻¹AP</strong>, then A and D are called <em>similar</em>. This is a stricter relationship: same space on both sides, same basis change applied to input and output. The simplest similar form is diagonal. Its diagonal entries are the <strong>eigenvalues</strong> of A.</p>
+  </div>
+
+  <div class="container">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Concept</th>
+          <th>Formula</th>
+          <th>What's Preserved</th>
+          <th>Normal Form</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Equivalence</td>
+          <td>B = PAQ</td>
+          <td>Rank only</td>
+          <td>Iᵣ in top-left, zeros elsewhere</td>
+        </tr>
+        <tr>
+          <td>Similarity</td>
+          <td>D = P⁻¹AP</td>
+          <td>Eigenvalues, trace, determinant, characteristic polynomial</td>
+          <td>Diagonal matrix diag(λ₁, λ₂, …)</td>
+        </tr>
+        <tr>
+          <td>SVD</td>
+          <td>A = UΣVᵀ</td>
+          <td>Everything — complete decomposition</td>
+          <td>Diagonal Σ, with orthogonal U and V</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="prose">
+    <p>The <strong>Singular Value Decomposition</strong> is the culmination: every matrix A, regardless of shape, can be written as A = UΣVᵀ where U and V are orthogonal matrices (pure rotations) and Σ is a diagonal matrix of singular values. The anatomy of any transformation is, at root: <em>rotate the input → scale each axis independently → rotate the output</em>. Nothing more complex than that.</p>
+    <p>Importantly, the matrices P, Q, U, V are never chosen arbitrarily. They are <em>forced</em> by the structure of the problem. Equivalence forces P and Q from the kernel and image. Similarity forces P to be the eigenvectors — because diagonalisation algebraically requires Avᵢ = λᵢvᵢ. SVD forces V from the eigenvectors of AᵀA — because that matrix measures precisely how much A stretches each input direction.</p>
+  </div>
+</section>
+
+<div class="ornamental-rule">— ✦ —</div>
+
+<!-- ════════════════════════════════════ -->
+<!-- CHAPTER 9 -->
+<!-- ════════════════════════════════════ -->
+<section id="orthogonal">
+  <div class="chapter">
+    <span class="chapter-number">Chapter 09</span>
+    <h2>Orthogonality — The Cleanest Tool</h2>
+    <p class="chapter-intro">Two vectors are orthogonal when their dot product is zero. Three letters. Profound consequences.</p>
+  </div>
+  <div class="prose">
+    <p>Perpendicular vectors share no common direction. They are maximally independent — not just linearly independent but <em>geometrically</em> independent. An orthogonal matrix is one whose columns form an orthonormal set: all pairs perpendicular, all lengths equal to one.</p>
+    <p>For an orthogonal matrix Q, the transpose equals the inverse: <strong>Qᵀ = Q⁻¹</strong>. This is the algebraic miracle of orthogonality — inversion, which normally costs O(n³) operations, becomes free: just flip the matrix. This happens because QᵀQ computes all pairwise dot products of columns, which are all zero (for off-diagonal entries) or one (on the diagonal) — giving the identity.</p>
+    <p>An orthogonal transformation does not stretch. It does not scale. It preserves every length and every angle. It is a <em>pure rotation</em> (or reflection). This means numerical errors cannot be amplified — a property of immense practical importance in computation.</p>
+
+    <div class="pullquote">
+      <p>Orthogonal transformations change your viewpoint without distorting your data. They are the safest moves in all of linear algebra.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule">
+
+<!-- ════════════════════════════════════ -->
+<!-- CHAPTER 10 -->
+<!-- ════════════════════════════════════ -->
+<section id="affine">
+  <div class="chapter">
+    <span class="chapter-number">Chapter 10</span>
+    <h2>Affine Space — Freeing the Origin</h2>
+    <p class="chapter-intro">Vector spaces have a sacred origin. Affine spaces ask: why should any point be special?</p>
+  </div>
+  <div class="prose">
+    <p>In a vector space, the zero vector is privileged. Every object is secretly a displacement from the origin. But in the real world, locations exist independently of any coordinate system. The temperature difference between today and yesterday is 5°C — a meaningful vector. But 20°C + 25°C does not equal 45°C in any useful sense. Points and displacements are fundamentally different objects.</p>
+    <p>An <strong>affine space</strong> formalises this distinction. It has a set of points with no algebraic structure, a vector space of displacements, and one connecting operation: <em>point + vector = point</em>. You can move a location by a displacement. You can find the displacement between two locations. But you cannot add two locations, and you cannot scale a location.</p>
+    <p>The beautiful fact: an affine space is a vector space that has forgotten where its origin is. Pick any point, declare it the origin, and you recover a vector space. Someone else picks a different origin — gets a different but equally valid vector space. The affine space is what both share: the structure that exists before anyone chooses coordinates.</p>
+  </div>
+
+  <div class="container">
+    <div class="math-block">
+      <span class="comment">// Allowed in affine space:</span><br>
+      point  +  vector  =  point      ✓<br>
+      point  −  point   =  vector     ✓<br>
+      vector + vector   =  vector     ✓<br><br>
+      <span class="comment">// Forbidden (undefined):</span><br>
+      point  +  point   =  ???        ✗<br>
+      scalar × point    =  ???        ✗<br><br>
+      <span class="comment">// Exception — affine combination (weights summing to 1):</span><br>
+      0.5 × P  +  0.5 × Q  =  midpoint   ✓  <span class="comment">// origin cancels out</span>
+    </div>
+  </div>
+</section>
+
+<div class="ornamental-rule">— ✦ —</div>
+
+<!-- ════════════════════════════════════ -->
+<!-- CHAPTER 11 -->
+<!-- ════════════════════════════════════ -->
+<section id="ml">
+  <div class="chapter">
+    <span class="chapter-number">Chapter 11</span>
+    <h2>Where It All Lives: Machine Learning &amp; Deep Learning</h2>
+    <p class="chapter-intro">Every concept in this essay appears, concretely and critically, in the systems that are reshaping the world.</p>
+  </div>
+  <div class="prose">
+    <p>A neural network is a composition of linear transformations and nonlinearities. Every single layer computes <strong>y = Wx + b</strong> — a matrix multiplication (linear transformation) followed by a bias shift (the affine part) followed by an activation function (the nonlinearity). Without the nonlinearity, stacking a hundred layers collapses into a single matrix. The activation function is what makes depth meaningful.</p>
+    <p>The connection goes deeper. A matrix is a sum of rank-one pieces — each piece a column times a row, carrying exactly one direction of information. A neural network layer does the same thing with neurons: each neuron learns one direction of the composite function being approximated. The Universal Approximation Theorem is the neural network version of SVD — given enough pieces, any function can be reconstructed.</p>
+  </div>
+
+  <div class="container">
+    <ul class="app-list">
+      <li>
+        <strong>PCA — Principal Component Analysis</strong>
+        <span>Diagonalises the covariance matrix via similarity transformation. The eigenvectors are the principal axes. The eigenvalues tell you how much variance each direction contains. Used everywhere data must be compressed or visualised.</span>
+      </li>
+      <li>
+        <strong>SVD — Image Compression &amp; Recommendations</strong>
+        <span>Any matrix = sum of rank-1 pieces. Keep only the top-k pieces. Netflix's recommendation engine, image compression, and document similarity all run on this idea. The singular values rank the pieces by importance.</span>
+      </li>
+      <li>
+        <strong>LoRA — Fine-tuning Large Language Models</strong>
+        <span>Instead of updating a full weight matrix W (billions of parameters), approximate the update as ΔW = BAᵀ using two thin low-rank matrices. A direct application of the observation that rank measures the true degrees of freedom. GPT, LLaMA, and Gemini are fine-tuned this way.</span>
+      </li>
+      <li>
+        <strong>Attention Mechanism — Transformers</strong>
+        <span>The Q, K, V matrices in self-attention are linear projections of the input. The attention pattern is a similarity matrix (dot products measure alignment). The whole mechanism is linear algebra — weighted combinations of value vectors.</span>
+      </li>
+      <li>
+        <strong>Orthogonal Weight Initialisation</strong>
+        <span>Initialising neural network weights as orthogonal matrices prevents vanishing and exploding gradients during training. Since orthogonal matrices preserve lengths, gradient magnitudes stay stable as they flow backwards through layers.</span>
+      </li>
+      <li>
+        <strong>Graph Neural Networks — Spectral Methods</strong>
+        <span>The graph Laplacian matrix is analysed through its eigenvalues. Similar graph structures produce similar eigenvalue spectra. Matrix similarity in the formal linear algebra sense classifies graph topology in GNNs.</span>
+      </li>
+      <li>
+        <strong>Normalising Flows — Generative Models</strong>
+        <span>An entire class of generative models built on the requirement that every transformation is an isomorphism — perfectly invertible bijections. Probability densities can be computed exactly because the transformations are reversible.</span>
+      </li>
+      <li>
+        <strong>Computer Graphics — Affine Transformations</strong>
+        <span>Translating, rotating, and scaling 3D objects requires affine transformations. Translation cannot be expressed as a linear map. The solution — homogeneous coordinates — embeds affine operations into a higher-dimensional linear space, a beautiful trick.</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- FINAL BAND -->
+<div class="band">
+  <h2>You were not learning a calculation tool.<br>You were learning the geometry<br><em>of how information flows.</em></h2>
+  <p>From a single equation with one unknown, to systems with a thousand variables, to the mathematical heart of language models — the thread is unbroken. Each concept was forced into existence by a problem the previous one couldn't solve. And each kept the same core idea: build complex things from simple building blocks, and find the coordinate system where the truth becomes simple.</p>
+</div>
+
+<!-- CLOSING -->
+<div class="prose" style="padding-top: 3rem; padding-bottom: 3rem;">
+  <p>The journey from 2x = 6 to the attention mechanism of a large language model is, in retrospect, a single continuous idea: <strong>find the right representation and the problem dissolves.</strong></p>
+  <p>Vectors gave us a language for direction. Matrices gave us a machine for transformation. Rank gave us a measure of information. Eigenvalues gave us the natural axes of a transformation. SVD gave us the complete anatomy of any linear map. Orthogonality gave us the cleanest possible coordinate changes. Affine space freed us from the tyranny of the origin.</p>
+  <p>Every abstraction was paid for by a concrete problem that couldn't be solved without it. And every abstraction, once made, immediately revealed itself to be not just a solution but a window — a new way of seeing that made the next problem visible.</p>
+  <p>That is what mathematics always does. It does not just solve problems. It changes what you can see.</p>
+</div>
+
+<footer>
+  <p>MATHEMATICAL DISPATCHES — SEEING LINEAR ALGEBRA LIKE A LAYMAN</p>
+  <p>A synthesis of first-principles conversations about vectors, matrices, transformations, and their role in modern machine learning.</p>
+  <p>✦ &nbsp; From simple algebra to deep learning — one unbroken thread &nbsp; ✦</p>
+</footer>
+
+</body>
+</html>
